@@ -1,0 +1,14 @@
+{
+  "name": "whiteboard",
+  "subdomain": "appwhiteboard",
+  "scripts": {
+    "start": "whiteBoard.js"
+  },
+  "version": "0.0.0-14",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "socket.io": "*"
+  }
+}

@@ -1,0 +1,501 @@
+
+<html>
+<head>
+<style>
+a { target-name:new;
+target-new:tab; }
+* {
+ font-family: Arial;
+}
+ body
+            {
+                margin: 0px;
+                padding: 0px;
+				width:100%;
+				height:100%;
+            }
+.vr {
+    width:1px;
+    background-color:#000;
+    position:absolute;
+    top:70;
+    bottom:0;
+    left:150px;
+}
+.can{
+float: right;
+display: block;
+position: absolute;
+top: 75;
+left: 155;
+}
+
+.myButton{
+    background:url('start_button.png') no-repeat;
+    cursor:pointer;
+    border:none;
+    width:100px;
+    height:48px;
+}
+
+.myButton:active  /* use Dot here */
+{   
+    background:url('start_button.png') no-repeat;
+}
+.Button1{
+    background:url('privatebutton.png') no-repeat;
+    cursor:pointer;
+    border:none;
+    width:135px;
+    height:43px;
+}
+
+.Button1:active  /* use Dot here */
+{   
+    background:url('privatebutton.png') no-repeat;
+}
+.myButton2{
+    background:url('clearbutton.png') no-repeat;
+    cursor:pointer;
+    border:none;
+    width:135px;
+    height:43px;
+}
+
+.myButton2:active  /* use Dot here */
+{   
+    background:url('clearbutton.png') no-repeat;
+}
+#top
+{
+background:url('Wbcopy.png') no-repeat;
+	top:0;
+}
+#mycanvas{
+background:white;
+}
+
+#x
+{
+    background:url('2ndpageheader.png') no-repeat;
+	top:0;
+	height:70px; width:1366px;
+	background-size: 1485px 70px;
+}
+#bottom
+{
+height:90px;
+}
+#users2
+{
+width:150px;
+}
+#usersx
+{
+width:150px;
+}
+
+#y
+{
+width:20px;
+}
+
+
+</style>
+
+<style type="text/css"> 
+.inputtext { width: 244px; height: 30px; } 
+</style> 
+<style type="text/css"> 
+.inputtext1 { width: 240px; height: 42px; } 
+</style> 
+<style type="text/css"> 
+.inputtext2 { width: 240px; height: 35px; } 
+</style> 
+
+
+<script src="/socket.io/socket.io.js"></script>
+			<script type="text/javascript"></script>
+			<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>				
+<title>
+whiteboard
+</title>	
+</head>
+
+<body background="Wbcopy.png" onload="resizePage();">
+<div id="top" >
+<div style="float:top">
+<img src="snaP.png" height="75" width="140" style="position:absolute; 
+float:left; 
+left:20px; 
+top:20px; 
+z-index:2;"></div>
+<div style="float:top">
+<img src="freetag.png" height="300" width="630" style="position:absolute; 
+float:right; 
+right:0px; 
+top:0px; 
+z-index:2;"></div>
+<br><br><br><br>
+<center> <img src="whiteboard.png"/></center>
+<center><input type="text" value="Type your name" id="text1" class="inputtext"  style="background-color:C8C8C8;border:2px solid #C8C8C8;" height="40" width="30" onclick="Abc()"></center><br>
+<div class="image">
+<center> <input type="button" class="myButton" onclick="toggle()" /></center>
+</div>
+</div>
+
+
+
+<div id="bottom" style="display:none;">	
+				<div id="x">
+		<br><button id="buttonid" class="Button1" style="float:right;background-color:white;color:black;position:relative;top:3;right:50;z-index: 2;" onclick="toggle1()" ></button>&nbsp
+		<input type='text'  id='userName1'class="inputtext1" style="float:right;background-color:C8C8C8;border:2px solid #C8C8C8;position:relative;top:3;right:80;z-index: 2;" height="200px" width="700px"/><div style="float:right;position:relative;top:3;right:85;z-index: 2;">
+		<font size='5' color="black">Name</font></div>
+		<input type='text' id="textid" class="inputtext2" style="float:right;display:none;position:relative;top:3;right:100;z-index: 2;" /><div id="1a" style="float:right;display:none;top:3;right:110;position:relative;">
+		<font size='5' color="black">Room Link</font></div>	
+		</div>
+		<input type="button" onclick="clear1()" class="myButton2" id="create2" style="float:right;background-color:white;color:black;position: relative;top: 42;right: 40;
+z-index: 2;"></input>
+		<div id="y">
+		<font size="5"><b>ONLINE<br>USERS</b></font><br><hr size="2" width="150" align="left" color="#00000">
+<div id="users2" style="color:black;float:top;overflow-y:scroll;"></div>
+				<div id="usersx" style="color:black;display:none;float:top;overflow-y:scroll;"><label class='own_name'></label></div>	</div>
+				
+<div class="vr">&nbsp;</div>					
+<canvas id="mycanvas" class="can" style="float:right;"> </canvas>
+		<div style="bottom: 60;left: 8; position: absolute;z-index: 1;visibility: show;">
+<font size="2">Brought to you by</font>
+</div>		
+	
+<div style="float:botton">
+<img src="snaP.png" style="position:absolute; 
+float:left; 
+left:0px; 
+bottom:0px; 
+z-index:2;"></div>
+</div>
+				
+
+				
+</body>
+<script>
+ function resizePage(){
+   window.resizeTo(window.innerWidth,window.innerHeight);
+    window.focus();
+  }
+$(function(){
+		$('#userName1').keypress(function(e) {
+		
+			if(e.which == 13) {
+			 username = $('#userName1').val();
+				if(window.location.hash)
+				{
+				room = window.location.hash.substr(1);
+					socket.emit('incominguser',{usernamev:username,roomv:room});
+					document.getElementById("userName1").value='';
+					}
+					else
+					{
+					 socket.emit('adduser',username);
+					 document.getElementById("userName1").value='';
+				draw();
+				}
+			}
+		});
+		});
+function Abc()
+{
+document.getElementById("text1").value='';
+}
+function toggle()
+{
+    var top = document.getElementById("top");
+    var bottom = document.getElementById("bottom");
+        top.style.display = "none";
+        bottom.style.display = "block";
+		add();
+}
+function toggle1()
+{
+
+		createRoom1();
+}
+
+var socket = io.connect("192.168.1.9:1339");
+	socket.on('connect',function(){
+	});
+	var m;
+	var username;
+	function add()
+	{
+	username=document.getElementById("text1").value;
+	m=document.getElementById("text1").value;
+	if(username!="Type your name")
+	{
+		jQuery('#userName1').css('display','block');
+	   socket.emit('adduser',username);
+	      draw();
+		  document.getElementById("userName1").value=''
+		  }
+		  else
+		  {
+		  username='';
+		  socket.emit('adduser',username);
+	      draw();}
+		  
+				}
+			var canvas, ctx;
+			var id;
+			var clients = {};
+			var r, g, b, color;
+			var drawing;
+			var prev = {};
+				
+			function draw()
+			{
+			jQuery('#mycanvas').css('display','block');
+			jQuery('#create2').css('display','block');
+			canvas = document.getElementById("mycanvas");
+				ctx = canvas.getContext("2d");
+				ctx.canvas.width  = window.innerWidth-160;
+				ctx.canvas.height = window.innerHeight-80;				
+				id = Math.round(Math.random());
+				r = Math.floor(Math.random() * 255) + 70;
+				g = Math.floor(Math.random() * 255) + 70;
+				b = Math.floor(Math.random() * 255) + 70;
+				color = 'rgb(' + r + ',' + g + ',' + b + ')';
+				drawing = false;
+		ctx.lineWidth = 5;		
+			canvas.addEventListener('mousedown',function(e)
+			 {
+					e.preventDefault();
+					drawing = true;
+					prev.x = e.pageX-canvas.offsetLeft;
+					prev.y = e.pageY-canvas.offsetTop;
+			});
+			canvas.addEventListener('mouseup', function(e)
+			{
+					 drawing = false;
+			});
+			
+			canvas.addEventListener('mousemove',function(e)
+			{
+					socket.emit('mousemove1',
+					{
+							'x': e.pageX-canvas.offsetLeft,
+							'y': e.pageY-canvas.offsetTop,
+							'drawing': drawing,
+							'color': color,
+							'id': id
+					});
+					if(drawing)
+					{
+							ctx.strokeStyle = color;
+							drawLine(prev.x, prev.y, e.pageX-canvas.offsetLeft, e.pageY-canvas.offsetTop);
+							prev.x = e.pageX-canvas.offsetLeft;
+							prev.y = e.pageY-canvas.offsetTop;
+					}
+			});
+		   socket.on('moving1', function(data) 
+			 {
+					
+					 if(data.drawing && clients[data.id])
+					{
+						ctx.strokeStyle = data.color;
+						drawLine(clients[data.id].x, clients[data.id].y, data.x, data.y);
+	
+					}
+					clients[data.id] = data;
+			});
+			}
+				
+       
+			function drawLine(fromx, fromy, tox, toy)
+			{
+					ctx.beginPath();
+					ctx.moveTo(fromx, fromy);
+					ctx.lineTo(tox, toy);
+					ctx.stroke();
+			}	
+				 
+			function clear1()
+			{	
+				ctx.clearRect ( 0 , 0 , ctx.canvas.width , ctx.canvas.height );
+			}
+	socket.on('Online3',function(username)
+			{
+		//alert(username);
+			document.getElementById("userName1").value=username;
+			});
+	
+		socket.on('updateusers',function(usernames,username){
+		//document.getElementById("userName1").value='';
+		$('#users2').empty();
+		$.each(usernames, function(key, value) {
+				$('#users2').append('<div>' + value + '</div>');
+		});
+		});
+		
+		
+		
+		var room;
+		function gotoRoom(url_val)
+		{
+		
+		//window.open(url_val,'_self');
+		document.location.href = url_val;
+		location.reload();
+	//  window.open(url_val).location.href=url_val;
+		//win.focus();		
+		}
+		
+	function createRoom1()
+			{
+				socket.emit('getUrl');
+			}
+			socket.on('sendRoom1',function(data)
+			{
+				var url_val = data['url_val'];
+				
+				var textv = "<a href='"+url_val+"' target='_blank' >'"+url_val+"'</a>";
+				
+				gotoRoom(url_val);
+				//$('#room_link1').html(textv);
+				
+					document.getElementById("textid").value= url_val;
+					var txt=url_val;
+				$('#room_link1').click(textv);
+				
+			});
+			
+			var x='';
+			socket.on('Online',function(data)
+			{
+			 x=x+data['users'];
+			
+				if((data['total_Players']-1)==data['i'])
+				{
+				}else
+				{
+					$('#usersx').append('<div>' + x + '</div>');
+					x='';
+					
+					}
+			//alert(data['users']);
+			//	 $('.own_name').html(data['users']);
+}					
+			
+);
+socket.on('Online2',function(info)
+			{
+			$('#usersx').empty();
+		$.each(info, function(key, value) {
+				$('#usersx').append('<div>' + value + '</div>');
+		});
+}							
+);
+
+		
+		socket.on('Online1',function(data)
+			{
+		
+			document.getElementById("userName1").value=data['users'];
+			});
+			var userName='';
+			$(document).ready(function(){
+			if(window.location.hash)
+				{	
+		var top = document.getElementById("top");
+    var bottom = document.getElementById("bottom");
+        top.style.display = "none";
+        bottom.style.display = "block";
+		jQuery('#buttonid').css('display','none');
+		document.getElementById("textid").value=location.href;
+		userName=document.getElementById("userName1").value;
+		//userName=document.getElementById("text1").value;
+					room = window.location.hash.substr(1);
+					socket.emit('incominguser',{usernamev:userName,roomv:room});
+					jQuery('#textid').css('display','block');
+				}
+				});
+			socket.on('PlayEvent',function(data)
+			{		
+			
+				jQuery('#room_link1').css('display','block');
+				var count = data['no_of_users']+1;
+				var msg = '';
+				jQuery('#usersx').css('display','block');
+				jQuery("#msg_user1").html(msg);
+				draw1();
+			});
+			function draw1()
+			{
+			
+			jQuery('#1a').css('display','block');
+				jQuery('#textid').css('display','block');
+			 var bottom = document.getElementById("bottom");
+			 bottom.style.display = "block";
+			canvas = document.getElementById("mycanvas");
+				ctx = canvas.getContext("2d");
+				jQuery('#exit').css('display','none');
+			jQuery('#mycanvas').css('display','block');
+			jQuery('#usersx').css('display','block');
+			jQuery('#create2').css('display','block');
+			jQuery('#buttonid').css('display','none');
+			jQuery('#users2').css('display','none');
+				ctx.canvas.width  = window.innerWidth-160;
+				ctx.canvas.height = window.innerHeight-80;					
+				id = Math.round(Math.random());
+				r = Math.floor(Math.random() * 255) + 70;
+				g = Math.floor(Math.random() * 255) + 70;
+				b = Math.floor(Math.random() * 255) + 70;
+				color = 'rgb(' + r + ',' + g + ',' + b + ')';
+				drawing = false;
+				ctx.lineWidth = 5;
+			canvas.addEventListener('mousedown',function(e)
+			 {
+					e.preventDefault();
+					drawing = true;
+					prev.x = e.pageX-canvas.offsetLeft;
+					prev.y = e.pageY-canvas.offsetTop;
+			});
+			canvas.addEventListener('mouseup', function(e)
+			{
+					 drawing = false;
+			});
+			
+			canvas.addEventListener('mousemove',function(e)
+			{
+					socket.emit('mousemove',
+					{
+							'x': e.pageX-canvas.offsetLeft,
+							'y': e.pageY-canvas.offsetTop,
+							'drawing': drawing,
+							'color': color,
+							'id': id,
+							'r1':room
+					});
+					if(drawing)
+					{
+							ctx.strokeStyle = color;
+							drawLine(prev.x, prev.y, e.pageX-canvas.offsetLeft, e.pageY-canvas.offsetTop);
+							prev.x = e.pageX-canvas.offsetLeft;
+							prev.y = e.pageY-canvas.offsetTop;
+					}
+					
+			});
+			 socket.on('moving', function(data) 
+			 {
+					
+					 if(data.drawing && clients[data.id])
+					{
+						ctx.strokeStyle = data.color;
+						drawLine(clients[data.id].x, clients[data.id].y, data.x, data.y);
+	
+					}
+					clients[data.id] = data;
+			});
+			}
+			
+	</script>
+</html>
